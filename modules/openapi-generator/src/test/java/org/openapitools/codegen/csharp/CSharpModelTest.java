@@ -596,4 +596,96 @@ public class CSharpModelTest {
         Assert.assertEquals(cm.imports.size(), 1);
         Assert.assertEquals(Sets.intersection(cm.imports, Sets.newHashSet("Children")).size(), 1);
     }
+
+
+    @Test(description = "verify parent variables work properly")
+    public void parentVarsTest() {
+        // test unsigned integer/long
+        final OpenAPI openAPI = TestUtils.parseFlattenSpec("src/test/resources/3_0/csharp/swagger.simplified.json");
+
+        CSharpClientCodegen codegen = new CSharpClientCodegen();
+
+        Schema test1 = openAPI.getComponents().getSchemas().get("pagedTenantResponse");
+        codegen.setOpenAPI(openAPI);
+        CodegenModel cm1 = codegen.fromModel("pagedTenantResponse", test1);
+        Assert.assertEquals(cm1.getClassname(), "PagedTenantResponse");
+
+        final CodegenProperty varItems = cm1.vars.get(0);
+        Assert.assertEquals(varItems.baseName, "items");
+        Assert.assertEquals(varItems.dataType, "List<Tenant>");
+        Assert.assertEquals(varItems.defaultValue, null); //"default(List<Tenant>)");
+        Assert.assertNotNull(varItems.defaultValueWithParam);//, null); //"default(List<Tenant>)");
+
+        int parentVarSize = cm1.parentVars.size();
+
+        Assert.assertNotEquals(parentVarSize, 0, "parentVars was not expected to be empty.");
+
+        final CodegenProperty parentVarProperty1 = cm1.parentVars.get(0);
+        Assert.assertEquals(parentVarProperty1.baseName, "page");
+        Assert.assertEquals(parentVarProperty1.dataType, "int");
+
+        final CodegenProperty property1 = cm1.allVars.get(0);
+        Assert.assertEquals(property1.baseName, "page");
+        Assert.assertEquals(property1.dataType, "int");
+
+        final CodegenProperty property2= cm1.allVars.get(1);
+        Assert.assertEquals(property2.baseName, "pageCount");
+        Assert.assertEquals(property2.dataType, "int");
+
+        final CodegenProperty property3= cm1.allVars.get(2);
+        Assert.assertEquals(property3.baseName, "pageSize");
+        Assert.assertEquals(property3.dataType, "int");
+
+
+        final CodegenProperty property4= cm1.allVars.get(3);
+        Assert.assertEquals(property4.baseName, "totalItemCount");
+        Assert.assertEquals(property4.dataType, "int");
+
+
+        final CodegenProperty property5= cm1.allVars.get(4);
+        Assert.assertEquals(property5.baseName, "status");
+        Assert.assertEquals(property5.dataType, "ResponseStatus");
+
+        final CodegenProperty property6= cm1.allVars.get(5);
+        Assert.assertEquals(property6.baseName, "hasErrors");
+        Assert.assertEquals(property6.dataType, "bool");
+
+        final CodegenProperty property8= cm1.allVars.get(6);
+        Assert.assertEquals(property8.baseName, "isValid");
+        Assert.assertEquals(property8.dataType, "bool");
+
+        final CodegenProperty property9= cm1.allVars.get(7);
+        Assert.assertEquals(property9.baseName, "items");
+        Assert.assertEquals(property9.dataType, "List<Tenant>");
+    }
+
+    @Test(description = "verify parent variables work properly")
+    public void inlineEnums() {
+        // test unsigned integer/long
+        final OpenAPI openAPI = TestUtils.parseFlattenSpec("src/test/resources/3_0/csharp/swagger.simplified.json");
+
+        CSharpClientCodegen codegen = new CSharpClientCodegen();
+        codegen.setOpenAPI(openAPI);
+
+        Schema test1 = openAPI.getComponents().getSchemas().get("receivedAlert");
+        CodegenModel cm1 = codegen.fromModel("receivedAlert", test1);
+        Assert.assertEquals(cm1.getClassname(), "ReceivedAlert");
+
+        CodegenProperty alertType = null;
+
+        for(int i = 0; i < cm1.readWriteVars.size(); i++) {
+            final CodegenProperty readWriteVar = cm1.readWriteVars.get(i);
+
+            if(readWriteVar.baseName.equals("alertType")) {
+                alertType= readWriteVar;
+
+                Assert.assertEquals(alertType.baseName, "alertType");
+                Assert.assertEquals(alertType.dataType, "AlertType");
+                Assert.assertEquals(alertType.defaultValue, null);
+            }
+
+        }
+
+        Assert.assertNotNull(alertType,"Unable to locate the AlertType property");
+    }
 }

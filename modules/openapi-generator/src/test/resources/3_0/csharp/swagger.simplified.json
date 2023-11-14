@@ -1,0 +1,2328 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "version": "2.2.12",
+        "title": "Tamarack",
+        "description": "**API v2**\n\nThis is the working mobile spec for Tamarack\n\n"
+    },
+    "host": "admin.dev.alertsense.io",
+    "basePath": "/api",
+    "schemes": [
+        "http",
+        "https"
+    ],
+    "consumes": [
+        "application/json"
+    ],
+    "produces": [
+        "application/json"
+    ],
+    "paths": {
+        "/v2/tenants": {
+            "get": {
+                "operationId": "getTenants",
+                "description": "Returns a collection of AlertDefaultSettings filtered by optional query arguments",
+                "tags": [
+                    "tenant"
+                ],
+                "parameters": [
+                    {
+                        "name": "ids",
+                        "in": "query",
+                        "description": "the tenant ids of the tenants to return",
+                        "required": false,
+                        "type": "array",
+                        "items": {
+                            "type": "integer",
+                            "format": "int32"
+                        }
+                    },
+                    {
+                        "name": "brand",
+                        "in": "query",
+                        "description": "the brand to filter tenants by",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "search",
+                        "in": "query",
+                        "description": "the string to search for",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "state",
+                        "in": "query",
+                        "description": "the state code of a tenant",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "name": "page",
+                        "in": "query",
+                        "description": "the page number of groups to return. (1 by default)",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int32"
+                    },
+                    {
+                        "name": "pageSize",
+                        "in": "query",
+                        "description": "the desired number of groups per page. (25 by default)",
+                        "required": false,
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/pagedTenantResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "totalItemCount": 1,
+                                "pageCount": 1,
+                                "page": 1,
+                                "pageSize": 25,
+                                "items": [
+                                    {
+                                        "id": 1000,
+                                        "name": "Sample Tenant",
+                                        "globalId": "id.sampletenant",
+                                        "brandName": "Konexus",
+                                        "expired": false,
+                                        "requireSSO": false
+                                    },
+                                    {
+                                        "id": 1001,
+                                        "name": "Example Tenant",
+                                        "globalId": "id.exampletenant",
+                                        "brandName": "AlertSense",
+                                        "expired": false,
+                                        "requireSSO": false
+                                    }
+                                ],
+                                "hasErrors": false,
+                                "isValid": true
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/v2/user/alerts/received": {
+            "get": {
+                "operationId": "getAlertsReceived",
+                "description": "Returns a paged list of the alerts received by the current user.",
+                "tags": [
+                    "user",
+                    "alerts"
+                ],
+                "parameters": [
+                    {
+                        "in": "query",
+                        "name": "after",
+                        "description": "Filter alerts by date sent.",
+                        "required": false,
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    {
+                        "in": "query",
+                        "name": "before",
+                        "description": "Filter alerts by date sent.",
+                        "required": false,
+                        "type": "string",
+                        "format": "date-time"
+                    },
+                    {
+                        "in": "query",
+                        "name": "alertType",
+                        "description": "Filter alerts by type.",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "Default",
+                            "Poll",
+                            "Conference"
+                        ]
+                    },
+                    {
+                        "in": "query",
+                        "name": "facilityName",
+                        "description": "Filter alerts by facility name.",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "hidden",
+                        "description": "Filter alerts by visibility.",
+                        "required": false,
+                        "type": "boolean"
+                    },
+                    {
+                        "in": "query",
+                        "name": "incident",
+                        "description": "Filter alerts by incident name.",
+                        "required": false,
+                        "type": "string"
+                    },
+                    {
+                        "in": "query",
+                        "name": "messagepriority",
+                        "description": "Filter alerts by priority.",
+                        "required": false,
+                        "type": "string",
+                        "enum": [
+                            "Emergency",
+                            "NonEmergency"
+                        ]
+                    },
+                    {
+                        "$ref": "#/parameters/page"
+                    },
+                    {
+                        "$ref": "#/parameters/pageSize"
+                    },
+                    {
+                        "$ref": "#/parameters/sort"
+                    },
+                    {
+                        "in": "query",
+                        "name": "subject",
+                        "description": "Filter alerts by subject.",
+                        "required": false,
+                        "type": "string"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success.",
+                        "schema": {
+                            "$ref": "#/definitions/pagedReceivedAlertResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "totalItemCount": 10,
+                                "pageCount": 5,
+                                "page": 1,
+                                "pageSize": 2,
+                                "items": [
+                                    {
+                                        "id": 1118,
+                                        "regionName": "AlertSense Admin Region",
+                                        "alertType": "Default",
+                                        "formType": "Quick",
+                                        "sender": {
+                                            "id": 1234,
+                                            "asset": {
+                                                "id": "539569f532ce46b293a0d4190f10ba3d",
+                                                "name": "Tokyo Hilton"
+                                            },
+                                            "displayName": "Development Administrator",
+                                            "email": "dev@alertsense.com"
+                                        },
+                                        "message": {
+                                            "priority": "Emergency",
+                                            "incident": {
+                                                "id": "cda88217754f4dcca6e85f837493df8f",
+                                                "name": "Criminal Activity"
+                                            },
+                                            "incidentId": "cda88217754f4dcca6e85f837493df8f",
+                                            "basic": {
+                                                "subject": "AlertSense Dev Environment",
+                                                "message": "This is a test message."
+                                            },
+                                            "files": [],
+                                            "language": "en-us"
+                                        },
+                                        "channels": {
+                                            "email": {
+                                                "send": true
+                                            },
+                                            "fax": {
+                                                "send": false
+                                            },
+                                            "push": {
+                                                "send": false
+                                            },
+                                            "textMessage": {
+                                                "primary": true,
+                                                "secondary": false,
+                                                "deliveryMethod": "Sms",
+                                                "send": true
+                                            },
+                                            "voice": {
+                                                "send": true
+                                            }
+                                        },
+                                        "recipients": {
+                                            "uniqueMyAlertsAppCount": 10,
+                                            "uniqueEtnCount": 5,
+                                            "uniqueContactCount": 45,
+                                            "groupIds": [
+                                                1003
+                                            ],
+                                            "contactIds": [
+                                                1001,
+                                                1002,
+                                                1003
+                                            ]
+                                        },
+                                        "timeSent": "/Date(1461277191093-0000)/",
+                                        "isRead": true,
+                                        "isHidden": false,
+                                        "isExpired": false
+                                    },
+                                    {
+                                        "id": 1119,
+                                        "alertType": "Default",
+                                        "formType": "Quick",
+                                        "sender": {
+                                            "asset": {
+                                                "id": "539569f532ce46b293a0d4190f10ba3d",
+                                                "name": "Tokyo Hilton"
+                                            },
+                                            "id": 1234,
+                                            "displayName": "Development Administrator",
+                                            "email": "dev@alertsense.com"
+                                        },
+                                        "message": {
+                                            "priority": "Emergency",
+                                            "incident": {
+                                                "id": "e03472cc9a3843d182986e01e1f02307",
+                                                "name": "Infrastructure Failure/Damage"
+                                            },
+                                            "incidentId": "e03472cc9a3843d182986e01e1f02307",
+                                            "basic": {
+                                                "subject": "AlertSense Dev Environment",
+                                                "message": "This is a test message."
+                                            },
+                                            "files": [],
+                                            "language": "en-us"
+                                        },
+                                        "channels": {
+                                            "email": {
+                                                "send": true
+                                            },
+                                            "fax": {
+                                                "send": false
+                                            },
+                                            "push": {
+                                                "send": false
+                                            },
+                                            "textMessage": {
+                                                "primary": true,
+                                                "secondary": false,
+                                                "deliveryMethod": "Sms",
+                                                "send": true
+                                            },
+                                            "voice": {
+                                                "send": true
+                                            }
+                                        },
+                                        "recipients": {
+                                            "uniqueMyAlertsAppCount": 10,
+                                            "uniqueEtnCount": 5,
+                                            "uniqueContactCount": 45,
+                                            "groupIds": [
+                                                1003
+                                            ],
+                                            "contactIds": [
+                                                1001,
+                                                1002,
+                                                1003
+                                            ]
+                                        },
+                                        "timeSent": "/Date(1461277191093-0000)/",
+                                        "isRead": false,
+                                        "isHidden": false,
+                                        "isExpired": true
+                                    }
+                                ],
+                                "hasErrors": false,
+                                "isValid": true
+                            }
+                        }
+                    },
+                    "401": {
+                        "description": "Unauthorized.",
+                        "schema": {
+                            "$ref": "#/definitions/errorResponse"
+                        },
+                        "examples": {
+                            "application/json": {
+                                "error": "Unauthorized."
+                            }
+                        }
+                    }
+                }
+            },
+            "patch": {
+                "operationId": "updateAlertsReceived",
+                "description": "Updates a list of alerts received by the current user.",
+                "tags": [
+                    "user",
+                    "alerts"
+                ],
+                "parameters": [
+                    {
+                        "in": "body",
+                        "name": "updateAlertsReceivedRequest",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/updateAlertsReceivedRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Success"
+                    },
+                    "400": {
+                        "description": "Bad request, likely due to validation errors.",
+                        "schema": {
+                            "$ref": "#/definitions/apiResponse"
+                        }
+                    }
+                }
+            }
+        }
+    },
+    "parameters": {
+        "page": {
+            "name": "page",
+            "in": "query",
+            "description": "The page number of items to return. (1 by default)",
+            "required": false,
+            "default": 1,
+            "type": "integer",
+            "format": "int32"
+        },
+        "pageSize": {
+            "name": "pageSize",
+            "in": "query",
+            "description": "The desired number of items per page. (25 by default)",
+            "default": 25,
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+        },
+        "search": {
+            "name": "search",
+            "in": "query",
+            "description": "A value matched against one or more resource properties.",
+            "required": false,
+            "type": "string"
+        },
+        "sort": {
+            "name": "sort",
+            "in": "query",
+            "description": "A comma seperated list of properties to order by. Properties preceded by a '-' will be ordered descending. (e.g.  ?sort=lastName,firstName,-responseTime). Property names are case insensitive.",
+            "required": false,
+            "type": "string"
+        },
+        "level": {
+            "name": "level",
+            "in": "query",
+            "description": "The level of history items.",
+            "required": false,
+            "type": "string",
+            "enum": [
+                "Debug",
+                "Information",
+                "Warning",
+                "Error"
+            ]
+        },
+        "integrationsCategory": {
+            "name": "category",
+            "in": "query",
+            "description": "The category of integration history items.",
+            "required": false,
+            "type": "string",
+            "enum": [
+                "None",
+                "Event",
+                "Trigger",
+                "Action",
+                "Status"
+            ]
+        },
+        "startDate": {
+            "name": "startDate",
+            "in": "query",
+            "description": "The starting date for the date range.",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+        },
+        "endDate": {
+            "name": "endDate",
+            "in": "query",
+            "description": "The ending date for the date range.",
+            "required": false,
+            "type": "string",
+            "format": "date-time"
+        }
+    },
+    "responses": {
+        "204": {
+            "description": "Success. No Content."
+        },
+        "400": {
+            "description": "Bad request.",
+            "schema": {
+                "$ref": "#/definitions/errorResponse"
+            },
+            "examples": {
+                "application/json": {
+                    "error": "Bad request."
+                }
+            }
+        },
+        "401": {
+            "description": "Unauthorized.",
+            "schema": {
+                "$ref": "#/definitions/errorResponse"
+            },
+            "examples": {
+                "application/json": {
+                    "error": "Unauthorized."
+                }
+            }
+        },
+        "403": {
+            "description": "Forbidden.",
+            "schema": {
+                "$ref": "#/definitions/errorResponse"
+            },
+            "examples": {
+                "application/json": {
+                    "error": "Forbidden."
+                }
+            }
+        },
+        "404": {
+            "description": "Not Found.",
+            "schema": {
+                "$ref": "#/definitions/errorResponse"
+            },
+            "examples": {
+                "application/json": {
+                    "error": "Not Found."
+                }
+            }
+        },
+        "500": {
+            "description": "Internal server error.",
+            "schema": {
+                "$ref": "#/definitions/errorResponse"
+            },
+            "examples": {
+                "application/json": {
+                    "error": "Unexpected server error."
+                }
+            }
+        }
+    },
+    "definitions": {
+        "alertReceivedUpdate": {
+            "properties": {
+                "id": {
+                    "description": "The alert id of the history record to update.",
+                    "type": "integer",
+                    "format": "int32"
+                },
+                "hide": {
+                    "description": "A flag indicating whether to hide or un-hide the alert history record.",
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "alertSettings": {
+            "discriminator": "type",
+            "properties": {
+                "alertType": {
+                    "$ref": "#/definitions/alertType"
+                },
+                "capXml": {
+                    "type": "string"
+                },
+                "channels": {
+                    "$ref": "#/definitions/channelSettings"
+                },
+                "formType": {
+                    "$ref": "#/definitions/formType"
+                },
+                "id": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "location": {
+                    "$ref": "#/definitions/locationSettings"
+                },
+                "message": {
+                    "$ref": "#/definitions/messageSettings"
+                },
+                "recipients": {
+                    "$ref": "#/definitions/recipientSettings"
+                },
+                "mobileBroadcast": {
+                    "$ref": "#/definitions/mobileBroadcastSettings"
+                },
+                "regionId": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "regionName": {
+                    "type": "string"
+                },
+                "related": {
+                    "items": {
+                        "$ref": "#/definitions/relatedAlert"
+                    },
+                    "type": "array"
+                },
+                "schedule": {
+                    "$ref": "#/definitions/scheduleSettings"
+                },
+                "security": {
+                    "$ref": "#/definitions/securitySettings"
+                },
+                "sender": {
+                    "$ref": "#/definitions/senderSettings"
+                },
+                "timeSent": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "userId": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "workflow": {
+                    "$ref": "#/definitions/workflowSettings"
+                },
+                "hidden": {
+                    "type": "boolean"
+                },
+                "completionStatus": {
+                    "$ref": "#/definitions/alertStatus"
+                },
+                "brandId": {
+                    "format": "int32",
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "alertStatus": {
+            "properties": {
+                "id": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "status": {
+                    "type": "string"
+                },
+                "alertCompletion": {
+                    "enum": [
+                        "Sent",
+                        "Processing",
+                        "Failed"
+                    ],
+                    "type": "string"
+                },
+                "pollResults": {
+                    "$ref": "#/definitions/pollResults"
+                }
+            },
+            "type": "object"
+        },
+        "alertType": {
+            "type": "string",
+            "enum": [
+                "Unused",
+                "Default",
+                "Poll",
+                "Conference"
+            ]
+        },
+        "apiResponse": {
+            "discriminator": "type",
+            "properties": {
+                "status": {
+                    "$ref": "#/definitions/responseStatus"
+                },
+                "hasErrors": {
+                    "description": "Set true when status.isSuccess is false.",
+                    "type": "boolean"
+                },
+                "isValid": {
+                    "description": "Set false on API parameter validation failures.",
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "assetInformation": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "externalId": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "basicMessage": {
+            "properties": {
+                "message": {
+                    "type": "string"
+                },
+                "subject": {
+                    "type": "string"
+                },
+                "messageRichContent": {
+                    "type": "string"
+                },
+                "messageBody": {
+                    "type": "string"
+                },
+                "externalLink": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "channelSettings": {
+            "properties": {
+                "eas": {
+                    "$ref": "#/definitions/easChannel"
+                },
+                "email": {
+                    "$ref": "#/definitions/emailChannel"
+                },
+                "etn": {
+                    "$ref": "#/definitions/etnChannel"
+                },
+                "facebook": {
+                    "$ref": "#/definitions/facebookChannel"
+                },
+                "fax": {
+                    "$ref": "#/definitions/faxChannel"
+                },
+                "push": {
+                    "$ref": "#/definitions/pushChannel"
+                },
+                "textMessage": {
+                    "$ref": "#/definitions/textMessageChannel"
+                },
+                "twitter": {
+                    "$ref": "#/definitions/twitterChannel"
+                },
+                "voice": {
+                    "$ref": "#/definitions/voiceChannel"
+                },
+                "mobileBroadcast": {
+                    "$ref": "#/definitions/mobileBroadcastChannel"
+                },
+                "myAlertsApp": {
+                    "$ref": "#/definitions/myAlertsAppChannel"
+                }
+            },
+            "type": "object"
+        },
+        "chatUser": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "displayName": {
+                    "type": "string"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                },
+                "emailAddress": {
+                    "type": "string"
+                },
+                "publicKey": {
+                    "type": "string"
+                },
+                "avatarUrl": {
+                    "type": "string"
+                },
+                "metadata": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "conferenceInvitation": {
+            "properties": {
+                "keyword": {
+                    "type": "string"
+                },
+                "keywordId": {
+                    "type": "string"
+                },
+                "question": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "contact": {
+            "properties": {
+                "id": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "credentialId": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "externalId": {
+                    "type": "string"
+                },
+                "firstName": {
+                    "type": "string"
+                },
+                "lastName": {
+                    "type": "string"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "emails": {
+                    "items": {
+                        "$ref": "#/definitions/emailAddress"
+                    },
+                    "type": "array"
+                },
+                "phones": {
+                    "items": {
+                        "$ref": "#/definitions/phoneNumber"
+                    },
+                    "type": "array"
+                },
+                "chatUser": {
+                    "$ref": "#/definitions/chatUser"
+                },
+                "asset": {
+                    "$ref": "#/definitions/assetInformation"
+                },
+                "type": {
+                    "type": "string"
+                },
+                "notes": {
+                    "type": "string"
+                },
+                "mobileAppUser": {
+                    "type": "boolean"
+                },
+                "agency": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "contactSummary": {
+            "properties": {
+                "id": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "externalId": {
+                    "type": "string"
+                },
+                "credentialId": {
+                    "format": "int32",
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "contentSettings": {
+            "properties": {
+                "publicContentId": {
+                    "format": "int32",
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "directorySettings": {
+            "properties": {
+                "directoryId": {
+                    "type": "string"
+                },
+                "contactIds": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "groupIds": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "mandatoryGroupIds": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "uniqueContactCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "geoTargetUsers": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "easChannel": {
+            "properties": {
+                "easDetailsUrl": {
+                    "type": "string"
+                },
+                "easId": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "recipientCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "send": {
+                    "type": "boolean"
+                },
+                "message": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "emailAddress": {
+            "properties": {
+                "address": {
+                    "type": "string"
+                }
+            }
+        },
+        "emailChannel": {
+            "properties": {
+                "recipientCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "send": {
+                    "type": "boolean"
+                },
+                "requestConfirmation": {
+                    "description": "When true, it instructs the backend to add a prompt for the recipient to confirm receipt of the email.",
+                    "type": "boolean"
+                },
+                "message": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "errorResponse": {
+            "properties": {
+                "error": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "etnChannel": {
+            "properties": {
+                "send": {
+                    "type": "boolean"
+                },
+                "publicUsers": {
+                    "type": "boolean"
+                },
+                "importUsers": {
+                    "type": "boolean"
+                },
+                "directoryUsers": {
+                    "type": "boolean"
+                },
+                "message": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "facebookChannel": {
+            "properties": {
+                "recipientCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "send": {
+                    "type": "boolean"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "pageIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "facility": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "location": {
+                    "$ref": "#/definitions/geoLocation"
+                },
+                "address1": {
+                    "type": "string"
+                },
+                "address2": {
+                    "type": "string"
+                },
+                "city": {
+                    "type": "string"
+                },
+                "state": {
+                    "type": "string"
+                },
+                "postalCode": {
+                    "type": "string"
+                },
+                "country": {
+                    "type": "string"
+                },
+                "area": {
+                    "type": "string"
+                },
+                "region": {
+                    "type": "string"
+                },
+                "phoneNumber": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "faxChannel": {
+            "properties": {
+                "recipientCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "send": {
+                    "type": "boolean"
+                },
+                "message": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "feature": {
+            "type": "object",
+            "properties": {
+                "geometry": {
+                    "$ref": "#/definitions/iGeometryObject"
+                },
+                "id": {
+                    "type": "string"
+                },
+                "properties": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "object"
+                    }
+                },
+                "bbox": {
+                    "type": "array",
+                    "items": {
+                        "format": "double",
+                        "type": "number"
+                    }
+                },
+                "crs": {
+                    "$ref": "#/definitions/icrsObject"
+                },
+                "type": {
+                    "enum": [
+                        "Point",
+                        "MultiPoint",
+                        "LineString",
+                        "MultiLineString",
+                        "Polygon",
+                        "MultiPolygon",
+                        "GeometryCollection",
+                        "Feature",
+                        "FeatureCollection"
+                    ],
+                    "type": "string"
+                }
+            }
+        },
+        "featureCollection": {
+            "type": "object",
+            "properties": {
+                "features": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/feature"
+                    }
+                },
+                "spatialReference": {
+                    "$ref": "#/definitions/spatialReference"
+                },
+                "bbox": {
+                    "type": "array",
+                    "items": {
+                        "format": "double",
+                        "type": "number"
+                    }
+                },
+                "crs": {
+                    "$ref": "#/definitions/icrsObject"
+                },
+                "type": {
+                    "enum": [
+                        "Point",
+                        "MultiPoint",
+                        "LineString",
+                        "MultiLineString",
+                        "Polygon",
+                        "MultiPolygon",
+                        "GeometryCollection",
+                        "Feature",
+                        "FeatureCollection"
+                    ],
+                    "type": "string"
+                }
+            }
+        },
+        "featureLayerSettings": {
+            "properties": {
+                "DirectoryId": {
+                    "type": "string"
+                },
+                "Name": {
+                    "type": "string"
+                },
+                "Count": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "FeaturesSource": {
+                    "enum": [
+                        "Default",
+                        "Assets",
+                        "Users",
+                        "Groups",
+                        "MobileUsers",
+                        "PublicUsers",
+                        "InternalUsers",
+                        "InfoCode",
+                        "E911",
+                        "MyAlertsAppUsers",
+                        "MultiDirectoryUsers"
+                    ],
+                    "type": "string"
+                },
+                "FilterGroupIds": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "FilterLegacyGroupIds": {
+                    "items": {
+                        "type": "integer"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "fileDetails": {
+            "properties": {
+                "contentType": {
+                    "type": "string"
+                },
+                "fileName": {
+                    "type": "string"
+                },
+                "length": {
+                    "format": "double",
+                    "type": "number"
+                },
+                "uri": {
+                    "format": "uri",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "fileModel": {
+            "properties": {
+                "Id": {
+                    "type": "string",
+                    "format": "guid"
+                },
+                "FileName": {
+                    "type": "string"
+                },
+                "ContentType": {
+                    "type": "string"
+                },
+                "Folder": {
+                    "type": "string"
+                },
+                "Path": {
+                    "type": "string"
+                },
+                "PublicUrl": {
+                    "type": "string"
+                },
+                "IsPrivate": {
+                    "type": "boolean"
+                },
+                "VoiceAudioUrl": {
+                    "type": "string"
+                },
+                "EasAudioUrl": {
+                    "type": "string"
+                },
+                "IsAudio": {
+                    "type": "boolean"
+                },
+                "IsImage": {
+                    "type": "boolean"
+                },
+                "DateCreated": {
+                    "type": "string",
+                    "format": "date-time"
+                }
+            }
+        },
+        "formType": {
+            "type": "string",
+            "enum": [
+                "Unused",
+                "Eas",
+                "Quick",
+                "Public",
+                "Balsa"
+            ]
+        },
+        "geoLocation": {
+            "properties": {
+                "latitude": {
+                    "format": "double",
+                    "type": "number"
+                },
+                "longitude": {
+                    "format": "double",
+                    "type": "number"
+                }
+            }
+        },
+        "groupSummary": {
+            "properties": {
+                "id": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "externalId": {
+                    "type": "string"
+                },
+                "isLink": {
+                    "type": "boolean"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "classification": {
+                    "type": "string"
+                },
+                "parentId": {
+                    "format": "int32",
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "iGeometryObject": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "enum": [
+                        "Point",
+                        "MultiPoint",
+                        "LineString",
+                        "MultiLineString",
+                        "Polygon",
+                        "MultiPolygon",
+                        "GeometryCollection",
+                        "Feature",
+                        "FeatureCollection"
+                    ],
+                    "type": "string",
+                    "readOnly": true
+                },
+                "bbox": {
+                    "type": "array",
+                    "items": {
+                        "format": "double",
+                        "type": "number"
+                    }
+                },
+                "coordinates": {
+                    "type": "array",
+                    "items": {
+                        "type": "array",
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "format": "double",
+                                "type": "number"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "icrsObject": {
+            "type": "object",
+            "properties": {
+                "type": {
+                    "enum": [
+                        "Unspecified",
+                        "Name",
+                        "Link"
+                    ],
+                    "type": "string",
+                    "readOnly": true
+                }
+            }
+        },
+        "incidentCategory": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
+        "incidentEvent": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "incidentCategory": {
+                    "$ref": "#/definitions/incidentCategory"
+                },
+                "incidentType": {
+                    "$ref": "#/definitions/incidentType"
+                }
+            }
+        },
+        "incidentSettings": {
+            "properties": {
+                "id": {
+                    "type": "string",
+                    "description": "Type: Guid. Identifier for this incident."
+                },
+                "name": {
+                    "type": "string"
+                },
+                "type": {
+                    "enum": [
+                        "Generic",
+                        "Named",
+                        "NotSpecified"
+                    ],
+                    "type": "string"
+                },
+                "priority": {
+                    "$ref": "#/definitions/priorityType"
+                },
+                "externalId": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "incidentType": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "showAssessment": {
+                    "type": "boolean"
+                },
+                "classification": {
+                    "description": "Incident type classification.",
+                    "enum": [
+                        "Emergency",
+                        "Operations"
+                    ],
+                    "type": "string"
+                },
+                "loudToneSettings": {
+                    "$ref": "#/definitions/loudToneSettings"
+                }
+            }
+        },
+        "latLng": {
+            "properties": {
+                "lat": {
+                    "format": "double",
+                    "type": "number"
+                },
+                "lng": {
+                    "format": "double",
+                    "type": "number"
+                }
+            },
+            "type": "object"
+        },
+        "locationSettings": {
+            "properties": {
+                "point": {
+                    "$ref": "#/definitions/latLng"
+                },
+                "facilities": {
+                    "items": {
+                        "$ref": "#/definitions/facility"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "loudToneSettings": {
+            "type": "object",
+            "properties": {
+                "onInitialIncidentReport": {
+                    "type": "boolean"
+                },
+                "onReply": {
+                    "type": "boolean"
+                },
+                "onForward": {
+                    "type": "boolean"
+                },
+                "onAssociatedEventCommunication": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "messageSettings": {
+            "properties": {
+                "basic": {
+                    "$ref": "#/definitions/basicMessage"
+                },
+                "conference": {
+                    "$ref": "#/definitions/conferenceInvitation"
+                },
+                "files": {
+                    "items": {
+                        "$ref": "#/definitions/fileDetails"
+                    },
+                    "type": "array"
+                },
+                "language": {
+                    "type": "string"
+                },
+                "poll": {
+                    "$ref": "#/definitions/pollQuestionModel"
+                },
+                "priority": {
+                    "$ref": "#/definitions/priorityType"
+                },
+                "incidentId": {
+                    "type": "string"
+                },
+                "incidentEvent": {
+                    "$ref": "#/definitions/incidentEvent"
+                },
+                "incident": {
+                    "$ref": "#/definitions/incidentSettings"
+                },
+                "severityAssessment": {
+                    "$ref": "#/definitions/severityAssessment"
+                },
+                "survey": {
+                    "$ref": "#/definitions/surveySettings"
+                },
+                "socialMedia": {
+                    "$ref": "#/definitions/socialMediaSettings"
+                },
+                "content": {
+                    "$ref": "#/definitions/contentSettings"
+                },
+                "expireDateTimeUtc": {
+                    "format": "date-time",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "mobileBroadcastChannel": {
+            "properties": {
+                "send": {
+                    "type": "boolean"
+                },
+                "message": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "mobileBroadcastSettings": {
+            "type": "object",
+            "properties": {
+                "areaDesc": {
+                    "type": "string"
+                },
+                "selectedLocations": {
+                    "items": {
+                        "$ref": "#/definitions/namedLocation"
+                    },
+                    "type": "array"
+                }
+            }
+        },
+        "myAlertsAppChannel": {
+            "properties": {
+                "send": {
+                    "type": "boolean"
+                },
+                "message": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "namedLocation": {
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "geocodeId": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "objectReference": {
+            "type": "object",
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "uri": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "description": {
+                    "type": "string"
+                }
+            }
+        },
+        "pagedApiResponse": {
+            "discriminator": "type",
+            "properties": {
+                "page": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "pageCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "totalItemCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "status": {
+                    "$ref": "#/definitions/responseStatus"
+                },
+                "hasErrors": {
+                    "description": "Set true when status.isSuccess is false.",
+                    "type": "boolean"
+                },
+                "isValid": {
+                    "description": "Set false on API parameter validation failures.",
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "pagedReceivedAlertResponse": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/pagedApiResponse"
+                },
+                {
+                    "properties": {
+                        "items": {
+                            "items": {
+                                "$ref": "#/definitions/receivedAlert"
+                            },
+                            "type": "array"
+                        }
+                    },
+                    "type": "object"
+                }
+            ],
+            "type": "object"
+        },
+        "pagedTenantResponse": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/pagedApiResponse"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "items": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/tenant"
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "phoneNumber": {
+            "properties": {
+                "number": {
+                    "type": "string"
+                },
+                "priority": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "phoneType": {
+                    "enum": [
+                        "Cell",
+                        "Business",
+                        "Home",
+                        "Government",
+                        "Fax",
+                        "Pager",
+                        "Blackberry",
+                        "None"
+                    ],
+                    "type": "string"
+                }
+            }
+        },
+        "pollOptionModel": {
+            "properties": {
+                "optionId": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "description": {
+                    "type": "string"
+                },
+                "selectionChoice": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "value": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "pollOptionResults": {
+            "properties": {
+                "count": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "Number of recipients that have responded with this option"
+                },
+                "description": {
+                    "type": "string",
+                    "description": "The text for this option."
+                },
+                "optionId": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "Id of this option"
+                },
+                "selectionChoice": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "Ordinal number of this option"
+                },
+                "value": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "The value for this option"
+                }
+            },
+            "type": "object"
+        },
+        "pollQuestionModel": {
+            "properties": {
+                "keyword": {
+                    "type": "string"
+                },
+                "keywordId": {
+                    "type": "string"
+                },
+                "options": {
+                    "items": {
+                        "$ref": "#/definitions/pollOptionModel"
+                    },
+                    "type": "array"
+                },
+                "question": {
+                    "type": "string"
+                },
+                "questionId": {
+                    "format": "int32",
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "pollResults": {
+            "properties": {
+                "totalResponded": {
+                    "type": "integer",
+                    "format": "int32",
+                    "description": "Number of recipients that have responded"
+                },
+                "question": {
+                    "type": "string",
+                    "description": "The question for the poll."
+                },
+                "optionResults": {
+                    "items": {
+                        "$ref": "#/definitions/pollOptionResults"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "priorityType": {
+            "type": "string",
+            "enum": [
+                "Unused",
+                "Emergency",
+                "NonEmergency",
+                "NotSpecified"
+            ]
+        },
+        "pushChannel": {
+            "properties": {
+                "recipientCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "send": {
+                    "type": "boolean"
+                },
+                "message": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "receivedAlert": {
+            "allOf": [
+                {
+                    "$ref": "#/definitions/alertSettings"
+                },
+                {
+                    "type": "object",
+                    "properties": {
+                        "isExpired": {
+                            "type": "boolean"
+                        },
+                        "isHidden": {
+                            "type": "boolean"
+                        },
+                        "isRead": {
+                            "type": "boolean"
+                        }
+                    }
+                }
+            ],
+            "type": "object"
+        },
+        "recipientSettings": {
+            "properties": {
+                "contactIds": {
+                    "items": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "type": "array"
+                },
+                "groupIds": {
+                    "items": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "type": "array"
+                },
+                "individualNumber": {
+                    "type": "string"
+                },
+                "searchIds": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "mandatoryGroupIds": {
+                    "items": {
+                        "format": "int32",
+                        "type": "integer"
+                    },
+                    "type": "array"
+                },
+                "uniqueContactCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "uniqueEtnCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "uniqueMyAlertsAppCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "contacts": {
+                    "items": {
+                        "$ref": "#/definitions/contactSummary"
+                    },
+                    "type": "array"
+                },
+                "groups": {
+                    "items": {
+                        "$ref": "#/definitions/groupSummary"
+                    },
+                    "type": "array"
+                },
+                "searches": {
+                    "items": {
+                        "$ref": "#/definitions/searchSummary"
+                    },
+                    "type": "array"
+                },
+                "geofences": {
+                    "$ref": "#/definitions/featureCollection"
+                },
+                "featureLayers": {
+                    "items": {
+                        "$ref": "#/definitions/featureLayerSettings"
+                    },
+                    "type": "array"
+                },
+                "directories": {
+                    "items": {
+                        "$ref": "#/definitions/directorySettings"
+                    },
+                    "type": "array"
+                },
+                "selectedGroupCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "selectedContactCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "uniqueGroupCount": {
+                    "format": "int32",
+                    "type": "integer"
+                }
+            },
+            "type": "object"
+        },
+        "relatedAlert": {
+            "properties": {
+                "relatedAlertId": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "alertRelationType": {
+                    "enum": [
+                        "Related",
+                        "Forward",
+                        "Reply",
+                        "ReplyAll"
+                    ],
+                    "type": "string"
+                },
+                "senderContacts": {
+                    "items": {
+                        "$ref": "#/definitions/contact"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "responseMessage": {
+            "type": "object",
+            "properties": {
+                "severity": {
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "resourceKey": {
+                    "type": "string"
+                }
+            },
+            "example": {
+                "severity": "Warning",
+                "message": "My custom message",
+                "resourceKey": "warnings.customMessage"
+            }
+        },
+        "responseStatus": {
+            "type": "object",
+            "properties": {
+                "resourceKey": {
+                    "type": "string"
+                },
+                "isSuccess": {
+                    "description": "False when errorCode is not None or there is an errorMessage or validationFailures.",
+                    "type": "boolean"
+                },
+                "errorCode": {
+                    "type": "string"
+                },
+                "errorMessage": {
+                    "type": "string"
+                },
+                "validationFailures": {
+                    "description": "API parameter validation failures.",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/validationFailure"
+                    }
+                },
+                "messages": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/responseMessage"
+                    }
+                }
+            },
+            "example": {
+                "resourceKey": "error.notFound",
+                "isSuccess": false,
+                "errorCode": "NotFound",
+                "errorMessage": "The item cannot be found.",
+                "validationFailures": [
+                    {
+                        "propertyName": "email",
+                        "errorMessage": "Value is required",
+                        "errorCode": "Required",
+                        "attemptedValue": "chester.tester@mailinator.com"
+                    }
+                ],
+                "messages": [
+                    {
+                        "severity": "Warning",
+                        "message": "My custom message"
+                    }
+                ]
+            }
+        },
+        "scheduleSettings": {
+            "properties": {
+                "duration": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "expireDateTimeUtc": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "recurringDay": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "recurringEnd": {
+                    "format": "date-time",
+                    "type": "string"
+                },
+                "scheduled": {
+                    "type": "boolean"
+                },
+                "scheduledDateTime": {
+                    "format": "date-time",
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "searchSummary": {
+            "properties": {
+                "id": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "securitySettings": {
+            "properties": {
+                "requireAuthentication": {
+                    "type": "boolean"
+                },
+                "voicePin": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "senderSettings": {
+            "properties": {
+                "id": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "asset": {
+                    "$ref": "#/definitions/assetInformation"
+                },
+                "callerId": {
+                    "type": "string"
+                },
+                "displayName": {
+                    "type": "string"
+                },
+                "email": {
+                    "type": "string"
+                },
+                "externalId": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "severityAssessment": {
+            "type": "object",
+            "properties": {
+                "responses": {
+                    "type": "array",
+                    "items": {
+                        "type": "object",
+                        "required": [
+                            "questionId",
+                            "optionId"
+                        ],
+                        "properties": {
+                            "questionId": {
+                                "type": "string"
+                            },
+                            "question": {
+                                "type": "string",
+                                "description": "Clients need not set this value. If missing, it will be set on the server."
+                            },
+                            "optionId": {
+                                "type": "string"
+                            },
+                            "option": {
+                                "type": "string",
+                                "description": "Clients need not set this value. If missing, it will be set on the server."
+                            }
+                        }
+                    }
+                },
+                "comment": {
+                    "type": "string"
+                }
+            }
+        },
+        "socialMediaSettings": {
+            "properties": {
+                "image": {
+                    "$ref": "#/definitions/fileModel"
+                }
+            },
+            "type": "object"
+        },
+        "spatialReference": {
+            "type": "object",
+            "properties": {
+                "wkid": {
+                    "format": "int32",
+                    "type": "integer"
+                }
+            }
+        },
+        "surveySettings": {
+            "type": "object",
+            "properties": {
+                "sender": {
+                    "$ref": "#/definitions/surveySummary"
+                },
+                "recipient": {
+                    "$ref": "#/definitions/surveySummary"
+                }
+            }
+        },
+        "surveySummary": {
+            "type": "object",
+            "properties": {
+                "survey": {
+                    "$ref": "#/definitions/objectReference"
+                },
+                "response": {
+                    "$ref": "#/definitions/objectReference"
+                },
+                "allowMultipleResponses": {
+                    "type": "boolean"
+                }
+            }
+        },
+        "tenant": {
+            "properties": {
+                "id": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "globalId": {
+                    "type": "string"
+                },
+                "brandName": {
+                    "type": "string"
+                },
+                "expired": {
+                    "type": "boolean"
+                },
+                "identityProviderString": {
+                    "type": "string"
+                },
+                "requireSSO": {
+                    "type": "boolean"
+                }
+            },
+            "type": "object"
+        },
+        "textMessageChannel": {
+            "properties": {
+                "recipientCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "send": {
+                    "type": "boolean"
+                },
+                "primary": {
+                    "type": "boolean"
+                },
+                "secondary": {
+                    "type": "boolean"
+                },
+                "deliveryMethod": {
+                    "enum": [
+                        "Sms",
+                        "Smtp"
+                    ],
+                    "type": "string"
+                },
+                "message": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "twitterChannel": {
+            "properties": {
+                "recipientCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "send": {
+                    "type": "boolean"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "accountIds": {
+                    "type": "array",
+                    "items": {
+                        "type": "integer",
+                        "format": "int32"
+                    }
+                }
+            },
+            "type": "object"
+        },
+        "updateAlertsReceivedRequest": {
+            "properties": {
+                "updates": {
+                    "description": "A collection of update operations on alert history records",
+                    "items": {
+                        "$ref": "#/definitions/alertReceivedUpdate"
+                    },
+                    "type": "array"
+                }
+            },
+            "type": "object"
+        },
+        "validationFailure": {
+            "type": "object",
+            "properties": {
+                "propertyName": {
+                    "type": "string"
+                },
+                "errorMessage": {
+                    "type": "string"
+                },
+                "errorCode": {
+                    "type": "string"
+                },
+                "attemptedValue": {
+                    "type": "object"
+                },
+                "resourceKey": {
+                    "type": "string"
+                }
+            },
+            "example": {
+                "propertyName": "email",
+                "errorMessage": "Value is required",
+                "errorCode": "Required",
+                "attemptedValue": "chester.tester@mailinator.com",
+                "resourceKey": "validation.required"
+            }
+        },
+        "voiceChannel": {
+            "properties": {
+                "recipientCount": {
+                    "format": "int32",
+                    "type": "integer"
+                },
+                "send": {
+                    "type": "boolean"
+                },
+                "homePhone": {
+                    "type": "boolean"
+                },
+                "cellPhone": {
+                    "type": "boolean"
+                },
+                "businessPhone": {
+                    "type": "boolean"
+                },
+                "landLine": {
+                    "type": "boolean"
+                },
+                "message": {
+                    "type": "string"
+                },
+                "audioFile": {
+                    "$ref": "#/definitions/fileModel"
+                },
+                "channelMessage": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        },
+        "workflowSettings": {
+            "properties": {
+                "key": {
+                    "type": "string"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "settings": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    }
+                },
+                "triggers": {
+                    "items": {
+                        "type": "string"
+                    },
+                    "type": "array"
+                },
+                "version": {
+                    "type": "string"
+                }
+            },
+            "type": "object"
+        }
+    }
+}

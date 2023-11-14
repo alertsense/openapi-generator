@@ -564,8 +564,14 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
     public CodegenModel fromModel(String name, Schema model) {
         Map<String, Schema> allDefinitions = ModelUtils.getSchemas(this.openAPI);
         CodegenModel codegenModel = super.fromModel(name, model);
+
+        LOGGER.warn("generating model for {}", codegenModel.parent);
+
+
         if (allDefinitions != null && codegenModel != null && codegenModel.parent != null) {
-            final Schema parentModel = allDefinitions.get(toModelName(codegenModel.parent));
+            LOGGER.warn("generating model for {}", codegenModel.parent);
+
+            final Schema parentModel = allDefinitions.get(codegenModel.parentSchema); //toModelName(codegenModel.parent));
             if (parentModel != null) {
                 final CodegenModel parentCodegenModel = super.fromModel(codegenModel.parent, parentModel);
                 if (codegenModel.hasEnums) {
@@ -573,6 +579,23 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
                 }
 
                 Map<String, CodegenProperty> propertyHash = new HashMap<>(codegenModel.vars.size());
+
+                LOGGER.warn("checking parent variables");
+
+
+                CodegenProperty last = null;
+                for (final CodegenProperty property : parentCodegenModel.vars) {
+                    // helper list of parentVars simplifies templating
+                    LOGGER.info("checking adding parent variable {}", property.name);
+                    if (!propertyHash.containsKey(property.name)) {
+                        final CodegenProperty parentVar = property.clone();
+                        parentVar.isInherited = true;
+                        last = parentVar;
+                        LOGGER.info("adding parent variable {}", property.name);
+                        codegenModel.parentVars.add(parentVar);
+                    }
+                }
+
                 for (final CodegenProperty property : codegenModel.vars) {
                     propertyHash.put(property.name, property);
                 }
@@ -583,17 +606,7 @@ public class CSharpClientCodegen extends AbstractCSharpCodegen {
                     }
                 }
 
-                CodegenProperty last = null;
-                for (final CodegenProperty property : parentCodegenModel.vars) {
-                    // helper list of parentVars simplifies templating
-                    if (!propertyHash.containsKey(property.name)) {
-                        final CodegenProperty parentVar = property.clone();
-                        parentVar.isInherited = true;
-                        last = parentVar;
-                        LOGGER.info("adding parent variable {}", property.name);
-                        codegenModel.parentVars.add(parentVar);
-                    }
-                }
+
             }
         }
 
